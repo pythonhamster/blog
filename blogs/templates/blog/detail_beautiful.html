@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ blog.title }} — {{ site_title }}{% endblock %}
+
+{% block content %}
+  <style>
+    /* Scoped to detail page */
+    .post-wrap { max-width: 860px; margin: 0 auto; }
+    .post-gap { margin-top: 16px; }          /* ⬅︎ adds space below navbar */
+    .post-body  { padding: 24px; line-height: 1.8; font-size: 1.06rem; color: #1e293b; }
+    .post-header { margin: 18px 0 10px; }
+    .post-title  { font-size: 2rem; letter-spacing: -.01em; color:#1e293b; }
+    .post-hero   { max-width: 860px; margin: 0 auto; }
+  </style>
+
+  <article class="post-wrap post-gap" itemscope itemtype="https://schema.org/BlogPosting">
+    {% if blog.image %}
+      <div class="card">
+        <div class="ratio-16x9 post-hero">
+          <img src="{{ blog.image.url }}" alt="{{ blog.title }}" itemprop="image" loading="lazy">
+          <span class="badge-date">
+            <time datetime="{{ blog.created_at|date:'c' }}" itemprop="datePublished">{{ blog.created_at|date:"M d, Y" }}</time>
+          </span>
+        </div>
+      </div>
+    {% endif %}
+
+    <header class="post-header">
+      <h1 class="title post-title" itemprop="headline">{{ blog.title }}</h1>
+      <div class="meta">
+        {% if blog.author and blog.author.picture %}
+          <img class="avatar" src="{{ blog.author.picture.url }}" alt="{{ blog.author.first_name }} {{ blog.author.last_name|default:'' }}" loading="lazy">
+        {% else %}
+          <img class="avatar" src="{% static 'img/avatar.png' %}" alt="Author" loading="lazy">
+        {% endif %}
+        <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+          <span itemprop="name">
+            {% if blog.author %}
+              {{ blog.author.first_name }} {{ blog.author.last_name|default:"" }}
+            {% else %}
+              Editorial
+            {% endif %}
+          </span>
+          · <time datetime="{{ blog.created_at|date:'c' }}">{{ blog.created_at|date:"M d, Y" }}</time>
+        </span>
+      </div>
+    </header>
+
+    <div class="card post-body" itemprop="articleBody">
+      {{ blog.content|default_if_none:""|safe }}
+    </div>
+
+    {% if related %}
+      <section style="margin-top:20px" aria-label="Related posts">
+        <h3 class="title" style="font-size:1.05rem;margin:0 0 8px;color:#1e293b">More to explore</h3>
+        <div class="hscroll">
+          {% for item in related %}
+            <a class="tiny-card" href="{% url 'blog:blog-detail' item.pk %}">
+              <div class="tc-img">
+                {% if item.image %}
+                  <img src="{{ item.image.url }}" alt="{{ item.title }}" loading="lazy">
+                {% else %}
+                  <img src="{% static 'img/placeholder-4x3.jpg' %}" alt="Placeholder" loading="lazy">
+                {% endif %}
+              </div>
+              <div class="tc-body">
+                <p class="tc-title">{{ item.title }}</p>
+                <p class="tc-date"><time datetime="{{ item.created_at|date:'c' }}">{{ item.created_at|date:"M d" }}</time></p>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  </article>
+{% endblock %}

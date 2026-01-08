@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ project.name }} — {{ site_title }}{% endblock %}
+
+{% block content %}
+  <style>
+    .proj-wrap { max-width: 980px; margin: 16px auto 0; }
+    .proj-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .proj-hero { aspect-ratio: 16 / 9; background: #e2e8f0; }
+    .proj-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .proj-body { padding: 18px 22px 22px; line-height: 1.7; color: var(--text); }
+    .proj-title { margin: 0 0 10px; color: var(--text); letter-spacing: -.01em; }
+    .proj-desc { margin: 0; color: var(--muted); }
+
+    .proj-links { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 8px 14px; border-radius: 10px; font-weight: 600;
+      border: 1px solid var(--line); background: var(--accent-soft); color: var(--accent);
+      cursor: pointer;
+    }
+    .btn-link:hover { background: var(--accent); color: #fff; }
+
+    /* Developers */
+    .devs { margin-top: 20px; }
+    .devs h3 { margin: 0 0 8px; color: var(--text); }
+    .dev-list { display: flex; gap: 14px; flex-wrap: wrap; }
+    .dev-chip {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--line); padding: 6px 8px; border-radius: 10px;
+      background: var(--bg2);
+    }
+    .dev-chip img {
+      width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+      border: 1px solid var(--line); background: #fff;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.6);
+      display: none; align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    .modal {
+      background: #fff; color: #111;
+      max-width: 800px; width: 90%; max-height: 90vh;
+      overflow: auto; border-radius: 10px; box-shadow: 0 12px 30px rgba(0,0,0,.4);
+      padding: 20px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 10px; right: 10px;
+      background: none; border: none; font-size: 1.5rem; cursor: pointer;
+      color: #333;
+    }
+  </style>
+
+  <article class="proj-wrap">
+    <div class="proj-card">
+      {% if project.photo %}
+        <div class="proj-hero">
+          <img src="{{ project.photo.url }}" alt="{{ project.name }}" loading="lazy">
+        </div>
+      {% endif %}
+
+      <div class="proj-body">
+        <h1 class="proj-title">{{ project.name }}</h1>
+        {% if project.description %}
+          <p class="proj-desc">{{ project.description }}</p>
+        {% endif %}
+
+        {% if project.github or project.gist %}
+          <div class="proj-links">
+            {% if project.github %}
+              <a class="btn-link" href="{{ project.github }}" target="_blank" rel="noopener">GitHub</a>
+            {% endif %}
+            {% if project.gist %}
+              <button class="btn-link" id="openGist">View Code</button>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="devs">
+          <h3>Developers</h3>
+          <div class="dev-list">
+            {% for d in project.developers.all %}
+              <div class="dev-chip">
+                {% if d.profile_photo %}
+                  <img src="{{ d.profile_photo.url }}" alt="{{ d.first_name }}" loading="lazy">
+                {% else %}
+                  <img src="{% static 'img/avatar.png' %}" alt="Avatar" loading="lazy">
+                {% endif %}
+                <span>{{ d.first_name }} {{ d.last_name|default:"" }}</span>
+              </div>
+            {% empty %}
+              <p style="margin:0;color:var(--muted)"><em>No developers assigned.</em></p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  {% if project.gist %}
+    <div class="modal-overlay" id="gistModal">
+      <div class="modal">
+        <button class="modal-close" id="closeGist">&times;</button>
+        <h2 style="margin-top:0">Gist: {{ project.name }}</h2>
+        <!-- GitHub embed script for Gist -->
+        <script src="{{ project.gist }}.js"></script>
+      </div>
+    </div>
+  {% endif %}
+
+  <script>
+    const openBtn = document.getElementById("openGist");
+    const modal = document.getElementById("gistModal");
+    const closeBtn = document.getElementById("closeGist");
+
+    if(openBtn && modal){
+      openBtn.addEventListener("click", () => modal.style.display = "flex");
+    }
+    if(closeBtn && modal){
+      closeBtn.addEventListener("click", () => modal.style.display = "none");
+    }
+    window.addEventListener("click", e => {
+      if(e.target === modal){ modal.style.display = "none"; }
+    });
+  </script>
+{% endblock %}

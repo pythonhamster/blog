@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Articles — {{ site_title }}{% endblock %}
+
+{% block content %}
+  <style>
+    /* Layout helpers for the alternating pattern */
+    .feature-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+      margin-top:16px;
+      align-items:stretch;
+    }
+    @media (min-width: 900px){
+      .feature-grid{ grid-template-columns: 1.3fr 1fr; }
+      .feature-grid.right { grid-template-columns: 1fr 1.3fr; }
+    }
+    .three-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+      margin-top:16px;
+    }
+    @media (min-width: 760px){ .three-grid{ grid-template-columns: repeat(2,1fr); } }
+    @media (min-width: 1100px){ .three-grid{ grid-template-columns: repeat(3,1fr); } }
+
+    .card-pad{ padding:12px; }
+    .media-medium .ratio-16x9,
+    .media-regular .ratio-16x9 { width:100%; }
+    .group-wrap{ margin-bottom: 24px; }
+  </style>
+
+  <section class="hero">
+    <h1>My ideas.My stories.Read by you</h1>
+    <p>Bloging What I Love</p>
+  </section>
+
+  {% if blogs %}
+    {# ========= GROUP 1 (Medium left, Regular right) ========= #}
+    <div class="group-wrap">
+      <div class="feature-grid">
+        {% with blogs|slice:"0:1"|first as medium %}
+          {% if medium %}
+            <article class="card card-pad media-medium">
+              <a href="{% url 'blog:blog-detail' medium.pk %}">
+                <div class="ratio-16x9">
+                  {% if medium.image %}
+                    <img src="{{ medium.image.url }}" alt="{{ medium.title }}" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'img/placeholder-16x9.jpg' %}" alt="Placeholder" loading="lazy">
+                  {% endif %}
+                  <span class="badge-date">{{ medium.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="card-content">
+                  <h2 class="title">{{ medium.title }}</h2>
+                  <p class="excerpt">{{ medium.content|default_if_none:""|striptags|truncatewords:24 }}</p>
+                </div>
+              </a>
+            </article>
+          {% endif %}
+        {% endwith %}
+
+        {% with blogs|slice:"1:2"|first as regular1 %}
+          {% if regular1 %}
+            <article class="card card-pad media-regular">
+              <a href="{% url 'blog:blog-detail' regular1.pk %}">
+                <div class="ratio-16x9">
+                  {% if regular1.image %}
+                    <img src="{{ regular1.image.url }}" alt="{{ regular1.title }}" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'img/placeholder-16x9.jpg' %}" alt="Placeholder" loading="lazy">
+                  {% endif %}
+                  <span class="badge-date">{{ regular1.created_at|date:"M d" }}</span>
+                </div>
+                <div class="card-content">
+                  <h3 class="title">{{ regular1.title }}</h3>
+                  <p class="excerpt">{{ regular1.content|default_if_none:""|striptags|truncatewords:18 }}</p>
+                </div>
+              </a>
+            </article>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="three-grid">
+        {% for blog in blogs|slice:"2:5" %}
+          <article class="card card-pad media-regular">
+            <a href="{% url 'blog:blog-detail' blog.pk %}">
+              <div class="ratio-16x9">
+                {% if blog.image %}
+                  <img src="{{ blog.image.url }}" alt="{{ blog.title }}" loading="lazy">
+                {% else %}
+                  <img src="{% static 'img/placeholder-16x9.jpg' %}" alt="Placeholder" loading="lazy">
+                {% endif %}
+                <span class="badge-date">{{ blog.created_at|date:"M d" }}</span>
+              </div>
+              <div class="card-content">
+                <h3 class="title">{{ blog.title }}</h3>
+                <p class="excerpt">{{ blog.content|default_if_none:""|striptags|truncatewords:18 }}</p>
+              </div>
+            </a>
+          </article>
+        {% endfor %}
+      </div>
+
+      <div class="three-grid">
+        {% for blog in blogs|slice:"5:8" %}
+          <article class="card card-pad media-regular">
+            <a href="{% url 'blog:blog-detail' blog.pk %}">
+              <div class="ratio-16x9">
+                {% if blog.image %}
+                  <img src="{{ blog.image.url }}" alt="{{ blog.title }}" loading="lazy">
+                {% else %}
+                  <img src="{% static 'img/placeholder-16x9.jpg' %}" alt="Placeholder" loading="lazy">
+                {% endif %}
+                <span class="badge-date">{{ blog.created_at|date:"M d" }}</span>
+              </div>
+              <div class="card-content">
+                <h3 class="title">{{ blog.title }}</h3>
+                <p class="excerpt">{{ blog.content|default_if_none:""|striptags|truncatewords:18 }}</p>
+              </div>
+            </a>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ========= GROUP 2 (Regular left, Medium right) ========= #}
+    <div class="group-wrap">
+      <div class="feature-grid right">
+        {% with blogs|slice:"8:9"|first as regular2 %}
+          {% if regular2 %}
+            <article class="card card-pad media-regular">
+              <a href="{% url 'blog:blog-detail' regular2.pk %}">
+                <div class="ratio-16x9">
+                  {% if regular2.image %}
+                    <img src="{{ regular2.image.url }}" alt="{{ regular2.title }}" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'img/placeholder-16x9.jpg' %}" alt="Placeholder" loading="lazy">
+                  {% endif %}
+                  <span class="badge-date">{{ regular2.created_at|date:"M d" }}</span>
+                </div>
+                <div class="card-content">
+                  <h3 class="title">{{ regular2.title }}</h3>
+                  <p class="excerpt">{{ regular2.content|default_if_none:""|striptags|truncatewords:18 }}</p>
+                </div>
+              </a>
+            </article>
+          {% endif %}
+        {% endwith %}
+
+        {% with blogs|slice:"9:10"|first as medium2 %}
+          {% if medium2 %}
+            <article class="card card-pad media-medium">
+              <a href="{% url 'blog:blog-detail' medium2.pk %}">
+                <div class="ratio-16x9">
+                  {% if medium2.image %}
+                    <img src="{{ medium2.image.url }}" alt="{{ medium2.title }}" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'img/placeholder-16x9.jpg' %}" alt="Placeholder" loading="lazy">
+                  {% endif %}
+                  <span class="badge-date">{{ medium2.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="card-content">
+                  <h2 class="title">{{ medium2.title }}</h2>
+                  <p class="excerpt">{{ medium2.content|default_if_none:""|striptags|truncatewords:24 }}</p>
+                </div>
+              </a>
+            </article>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="three-grid">
+        {% for blog in blogs|slice:"10:13" %}
+          <article class="card card-pad media-regular">
+            <a href="{% url 'blog:blog-detail' blog.pk %}">
+              <div class="ratio-16x9">
+                {% if blog.image %}
+                  <img src="{{ blog.image.url }}" alt="{{ blog.title }}" loading="lazy">
+                {% else %}
+                  <img src="{% static 'img/placeholder-16x9.jpg' %}" alt="Placeholder" loading="lazy">
+                {% endif %}
+                <span class="badge-date">{{ blog.created_at|date:"M d" }}</span>
+              </div>
+              <div class="card-content">
+                <h3 class="title">{{ blog.title }}</h3>
+                <p class="excerpt">{{ blog.content|default_if_none:""|striptags|truncatewords:18 }}</p>
+              </div>
+            </a>
+          </article>
+        {% endfor %}
+      </div>
+
+      <div class="three-grid">
+        {% for blog in blogs|slice:"13:16" %}
+          <article class="card card-pad media-regular">
+            <a href="{% url 'blog:blog-detail' blog.pk %}">
+              <div class="ratio-16x9">
+                {% if blog.image %}
+                  <img src="{{ blog.image.url }}" alt="{{ blog.title }}" loading="lazy">
+                {% else %}
+                  <img src="{% static 'img/placeholder-16x9.jpg' %}" alt="Placeholder" loading="lazy">
+                {% endif %}
+                <span class="badge-date">{{ blog.created_at|date:"M d" }}</span>
+              </div>
+              <div class="card-content">
+                <h3 class="title">{{ blog.title }}</h3>
+                <p class="excerpt">{{ blog.content|default_if_none:""|striptags|truncatewords:18 }}</p>
+              </div>
+            </a>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <div class="card" style="padding:16px;text-align:center">No posts published yet. Check back soon!</div>
+  {% endif %}
+{% endblock %}
